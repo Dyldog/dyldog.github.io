@@ -5,11 +5,7 @@ layout: home
 - dev
 - musician
 - lover of many things
-
-<ul>
-  {% for post in site.posts %}
-    <li>
-      <a href="{{ post.url }}">{{ post.title }}</a>
-    </li>
-  {% endfor %}
-</ul>
+- posts
+{% for post in site.posts %}
+    - {{ post.date | date: "%B %d, %Y" }}[{{ post.title }}]({{ post.url }})
+{% endfor %}
