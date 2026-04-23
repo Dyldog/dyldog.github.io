@@ -3,7 +3,7 @@ email: dylan.elliott@gmail.com
 description: >-
   BLOG
 baseurl: ""
-url: "dyldog.github.io"
+url: "https://dyldog.github.io"
 github_username: dyldog
 remote_theme: riggraz/no-style-please
 theme_config:
