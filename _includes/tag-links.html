@@ -1,0 +1,9 @@
+{% assign tags = include.tags | default: page.categories %}
+{% if tags and tags.size > 0 %}
+<nav class="tag-links" aria-label="Post tags">
+  {% for tag in tags %}
+    {% assign tag_id = tag | slugify %}
+    <a href="{{ '/tags/' | relative_url }}#{{ tag_id }}">{{ tag }}</a>
+  {% endfor %}
+</nav>
+{% endif %}
