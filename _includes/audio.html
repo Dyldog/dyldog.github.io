@@ -1,0 +1,4 @@
+<audio controls preload="{{ include.preload | default: 'metadata' }}" aria-label="{{ include.label | default: 'Audio player' }}">
+  <source src="{{ include.src | relative_url }}"{% if include.type %} type="{{ include.type }}"{% endif %}>
+  Your browser does not support embedded audio. <a href="{{ include.src | relative_url }}">Download the audio file</a>.
+</audio>
