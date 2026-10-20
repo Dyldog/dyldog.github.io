@@ -1,0 +1,162 @@
+{% assign first_track = include.tracks | first %}
+<div class="music-player" data-music-player>
+  <div class="music-player__now-playing">
+    <div class="music-player__eyebrow">Now playing <span data-player-count>01</span> / {{ include.tracks.size | prepend: '00' | slice: -2, 2 }}</div>
+    <h2 class="music-player__title" data-player-title>{{ first_track.title }}</h2>
+    <div class="music-player__visualizer" aria-hidden="true">
+      <i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i>
+    </div>
+  </div>
+
+  <div class="music-player__transport" aria-label="Player controls">
+    <button class="music-player__skip" type="button" data-player-previous aria-label="Previous track">↶</button>
+    <button class="music-player__play" type="button" data-player-toggle aria-label="Play {{ first_track.title }}" aria-pressed="false">
+      <span data-player-toggle-label>Play</span>
+    </button>
+    <button class="music-player__skip" type="button" data-player-next aria-label="Next track">↷</button>
+  </div>
+
+  <div class="music-player__timeline">
+    <time data-player-current>0:00</time>
+    <input data-player-seek type="range" min="0" max="100" value="0" step="0.1" aria-label="Seek through track">
+    <time data-player-duration>0:00</time>
+  </div>
+
+  <audio data-player-audio preload="metadata" src="{{ first_track.src | relative_url }}"></audio>
+
+  <ol class="music-player__playlist" aria-label="{{ include.label | default: 'Playlist' }}">
+    {% for track in include.tracks %}
+      <li>
+        <button type="button" data-player-track data-src="{{ track.src | relative_url }}" data-title="{{ track.title | escape }}" data-index="{{ forloop.index0 }}"{% if forloop.first %} class="is-current" aria-current="true"{% endif %}>
+          <span class="music-player__track-number">{{ forloop.index | prepend: '00' | slice: -2, 2 }}</span>
+          <span class="music-player__track-title">{{ track.title }}</span>
+          <span class="music-player__track-state" aria-hidden="true">Play</span>
+        </button>
+        <a class="music-player__download" href="{{ track.src | relative_url }}" download aria-label="Download {{ track.title }}">↓</a>
+      </li>
+    {% endfor %}
+  </ol>
+</div>
+
+<style>
+  .music-player {
+    --ink: #faf7ee;
+    --muted: #a9aaac;
+    --line: rgba(250, 247, 238, .18);
+    --acid: #d9ff57;
+    --hot: #ff5c82;
+    background: radial-gradient(circle at 12% 0%, #3b3c65 0, transparent 35%), radial-gradient(circle at 87% 100%, #5a2042 0, transparent 40%), #14151c;
+    border: 1px solid #353746;
+    border-radius: 22px;
+    box-shadow: 0 16px 40px rgba(14, 13, 20, .25);
+    color: var(--ink);
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    margin: 2rem 0;
+    max-width: 44rem;
+    overflow: hidden;
+  }
+  .music-player__now-playing { padding: 1.65rem 1.5rem .8rem; }
+  .music-player__eyebrow { color: var(--acid); font-size: .68rem; font-weight: 800; letter-spacing: .14em; text-transform: uppercase; }
+  .music-player__title { color: var(--ink); font-family: inherit; font-size: clamp(1.65rem, 6vw, 2.65rem); letter-spacing: -.08em; line-height: 1; margin: .55rem 0 1.1rem; overflow-wrap: anywhere; }
+  .music-player__visualizer { align-items: end; display: flex; gap: 4px; height: 2.8rem; }
+  .music-player__visualizer i { animation: music-player-pulse 1.2s ease-in-out infinite alternate; background: linear-gradient(var(--acid), var(--hot)); border-radius: 3px; height: 20%; opacity: .38; transform-origin: bottom; width: 100%; }
+  .music-player__visualizer i:nth-child(2n) { animation-delay: -.35s; }
+  .music-player__visualizer i:nth-child(3n) { animation-delay: -.7s; }
+  .music-player__visualizer i:nth-child(4n) { animation-delay: -.15s; }
+  .music-player:not(.is-playing) .music-player__visualizer i { animation-play-state: paused; height: 12%; }
+  @keyframes music-player-pulse { to { height: 100%; opacity: 1; } }
+  .music-player__transport { align-items: center; display: flex; gap: .7rem; justify-content: center; padding: .75rem 1.5rem 1rem; }
+  .music-player button { font: inherit; }
+  .music-player__play, .music-player__skip { border: 0; cursor: pointer; }
+  .music-player__play { background: var(--acid); border-radius: 999px; color: #171814; font-size: .82rem; font-weight: 900; min-width: 6.7rem; padding: .75rem 1rem; text-transform: uppercase; }
+  .music-player__skip { background: transparent; color: var(--ink); font-size: 1.35rem; line-height: 1; padding: .4rem; }
+  .music-player__play:hover { background: #edff9a; transform: translateY(-1px); }
+  .music-player__skip:hover { color: var(--acid); }
+  .music-player__timeline { align-items: center; color: var(--muted); display: grid; font-size: .67rem; gap: .7rem; grid-template-columns: 2.6rem 1fr 2.6rem; padding: 0 1.5rem 1.25rem; }
+  .music-player__timeline time:last-child { text-align: right; }
+  .music-player__timeline input { accent-color: var(--acid); cursor: pointer; min-width: 0; }
+  .music-player__playlist { border-top: 1px solid var(--line); list-style: none; margin: 0; padding: 0; }
+  .music-player__playlist li { align-items: stretch; border-bottom: 1px solid var(--line); display: flex; }
+  .music-player__playlist li:last-child { border-bottom: 0; }
+  .music-player__playlist button { align-items: center; background: transparent; border: 0; color: var(--ink); cursor: pointer; display: grid; flex: 1; gap: .8rem; grid-template-columns: 2.3rem 1fr auto; min-width: 0; padding: .9rem 1.5rem; text-align: left; }
+  .music-player__playlist button:hover, .music-player__playlist button.is-current { background: rgba(217, 255, 87, .1); }
+  .music-player__playlist button.is-current .music-player__track-number, .music-player__playlist button.is-current .music-player__track-state { color: var(--acid); }
+  .music-player__track-number, .music-player__track-state { color: var(--muted); font-size: .68rem; }
+  .music-player__track-title { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .music-player__track-state { text-transform: uppercase; }
+  .music-player__download { align-items: center; border-left: 1px solid var(--line); color: var(--muted); display: flex; padding: 0 1rem; text-decoration: none; }
+  .music-player__download:hover { background: rgba(255, 92, 130, .15); color: var(--hot); }
+  .music-player button:focus-visible, .music-player a:focus-visible, .music-player input:focus-visible { outline: 2px solid var(--hot); outline-offset: -2px; }
+</style>
+
+<script>
+  (() => {
+    document.querySelectorAll('[data-music-player]:not([data-player-ready])').forEach((player) => {
+      player.dataset.playerReady = 'true';
+      const audio = player.querySelector('[data-player-audio]');
+      const title = player.querySelector('[data-player-title]');
+      const count = player.querySelector('[data-player-count]');
+      const toggle = player.querySelector('[data-player-toggle]');
+      const toggleLabel = player.querySelector('[data-player-toggle-label]');
+      const seek = player.querySelector('[data-player-seek]');
+      const current = player.querySelector('[data-player-current]');
+      const duration = player.querySelector('[data-player-duration]');
+      const tracks = [...player.querySelectorAll('[data-player-track]')];
+      let trackIndex = 0;
+
+      const formatTime = (seconds) => {
+        if (!Number.isFinite(seconds)) return '0:00';
+        return `${Math.floor(seconds / 60)}:${String(Math.floor(seconds % 60)).padStart(2, '0')}`;
+      };
+      const updatePlayState = () => {
+        const playing = !audio.paused;
+        player.classList.toggle('is-playing', playing);
+        toggle.setAttribute('aria-pressed', String(playing));
+        toggle.setAttribute('aria-label', `${playing ? 'Pause' : 'Play'} ${title.textContent}`);
+        toggleLabel.textContent = playing ? 'Pause' : 'Play';
+        tracks[trackIndex].querySelector('.music-player__track-state').textContent = playing ? 'Live' : 'Play';
+      };
+      const selectTrack = (index, autoplay = false) => {
+        trackIndex = (index + tracks.length) % tracks.length;
+        const track = tracks[trackIndex];
+        audio.src = track.dataset.src;
+        audio.load();
+        title.textContent = track.dataset.title;
+        count.textContent = String(trackIndex + 1).padStart(2, '0');
+        current.textContent = '0:00';
+        duration.textContent = '0:00';
+        seek.value = 0;
+        tracks.forEach((item, itemIndex) => {
+          item.classList.toggle('is-current', itemIndex === trackIndex);
+          item.toggleAttribute('aria-current', itemIndex === trackIndex);
+          item.querySelector('.music-player__track-state').textContent = itemIndex === trackIndex ? 'Play' : '';
+        });
+        if (autoplay) audio.play().catch(() => updatePlayState());
+        updatePlayState();
+      };
+
+      toggle.addEventListener('click', () => audio.paused ? audio.play() : audio.pause());
+      player.querySelector('[data-player-previous]').addEventListener('click', () => selectTrack(trackIndex - 1, true));
+      player.querySelector('[data-player-next]').addEventListener('click', () => selectTrack(trackIndex + 1, true));
+      tracks.forEach((track, index) => track.addEventListener('click', () => {
+        if (index === trackIndex) {
+          if (audio.paused) audio.play();
+        } else {
+          selectTrack(index, true);
+        }
+      }));
+      audio.addEventListener('play', updatePlayState);
+      audio.addEventListener('pause', updatePlayState);
+      audio.addEventListener('loadedmetadata', () => duration.textContent = formatTime(audio.duration));
+      audio.addEventListener('timeupdate', () => {
+        current.textContent = formatTime(audio.currentTime);
+        seek.value = audio.duration ? (audio.currentTime / audio.duration) * 100 : 0;
+      });
+      audio.addEventListener('ended', () => selectTrack(trackIndex + 1, true));
+      seek.addEventListener('input', () => {
+        if (Number.isFinite(audio.duration)) audio.currentTime = audio.duration * (seek.value / 100);
+      });
+      updatePlayState();
+    });
+  })();
+</script>
