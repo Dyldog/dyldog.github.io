@@ -1,3 +1,30 @@
+.site-header--with-player {
+  align-items: start;
+  display: grid;
+  gap: 1.5rem;
+  grid-template-columns: minmax(0, 1fr) minmax(9rem, 12rem);
+}
+
+.site-header--with-player .mini-player {
+  justify-self: end;
+  text-align: left;
+}
+
+@media (max-width: 34rem) {
+  .site-header--with-player {
+    display: block;
+  }
+
+  .site-header--with-player .mini-player {
+    margin-top: 1rem;
+    text-align: left;
+  }
+
+  .site-header--with-player .mini-player__controls {
+    justify-content: flex-start;
+  }
+}
+
 .tag-links {
   display: flex;
   flex-wrap: wrap;

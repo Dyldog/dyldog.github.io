@@ -1,0 +1,19 @@
+---
+layout: default
+---
+<header{% if page.mini_player %} class="site-header site-header--with-player"{% endif %}>
+  <div>
+    <h1>{{ site.title }}</h1>
+    {%- if site.theme_config.show_description -%}
+      <p>{{ site.description }}</p>
+    {%- endif -%}
+  </div>
+  {% if page.mini_player %}
+    {% assign homepage_tracks = site.data.lez-danze | concat: site.data.some-other-jams %}
+    {% include mini-player.html tracks=homepage_tracks %}
+  {% endif %}
+</header>
+
+{%- include menu_item.html collection=site.data.menu.entries -%}
+
+{{ content }}

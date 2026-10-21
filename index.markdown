@@ -1,12 +1,13 @@
 ---
 layout: home
+mini_player: true
 ---
 
 * [dev](https://github.com/dyldog)
 * [musician](https://soundcloud.com/musical-dylan)
 * lover of many things
 
-<p>posts</p>
+<h2>Posts</h2>
 <ul class="post-list">
   {% for post in site.posts %}
     <li>

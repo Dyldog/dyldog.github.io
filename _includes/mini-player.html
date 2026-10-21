@@ -1,0 +1,70 @@
+{% assign first_track = include.tracks | first %}
+<section class="mini-player" data-mini-player aria-label="Random music player">
+  <p class="mini-player__eyebrow">random tune</p>
+  <div class="mini-player__main">
+    <div class="mini-player__row">
+      <p class="mini-player__track" aria-live="polite"><strong data-mini-title>{{ first_track.title }}</strong></p>
+      <div class="mini-player__controls">
+        <button type="button" data-mini-toggle aria-label="Pause audio" title="Pause audio"><span data-mini-toggle-icon aria-hidden="true">❚❚</span></button>
+        <button type="button" data-mini-random aria-label="Play another random track" title="Another random track"><span aria-hidden="true">↻</span></button>
+        <a data-mini-post href="{{ first_track.post | relative_url }}" aria-label="Go to this track's post" title="Go to post"><span aria-hidden="true">↗</span></a>
+      </div>
+    </div>
+  </div>
+  <audio data-mini-audio preload="metadata" autoplay playsinline loop src="{{ first_track.src | relative_url }}"></audio>
+  <div hidden data-mini-tracks>
+    {% for track in include.tracks %}
+      <span data-src="{{ track.src | relative_url }}" data-title="{{ track.title | escape }}" data-post="{{ track.post | relative_url }}"></span>
+    {% endfor %}
+  </div>
+</section>
+
+<style>
+  .mini-player { font-size: .8rem; margin: 0; width: fit-content; }
+  .mini-player__eyebrow { font-size: .7rem; margin: 0 0 .25rem; }
+  .mini-player__main { border-bottom: thin solid currentColor; border-top: thin solid currentColor; padding: .45rem 0; }
+  .mini-player__row { align-items: center; display: flex; gap: .6rem; }
+  .mini-player__track { margin: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .mini-player__controls { display: flex; flex: none; gap: .35rem; }
+  .mini-player button, .mini-player a { align-items: center; background: transparent; border: thin solid currentColor; color: inherit; cursor: pointer; display: inline-flex; font: inherit; height: 1.7rem; justify-content: center; padding: 0; text-decoration: none; width: 1.7rem; }
+  .mini-player button:hover, .mini-player a:hover, .mini-player button:focus-visible, .mini-player a:focus-visible { background: black; color: white; outline: none; }
+</style>
+
+<script>
+  (() => {
+    document.querySelectorAll('[data-mini-player]:not([data-mini-ready])').forEach((player) => {
+      player.dataset.miniReady = 'true';
+      const audio = player.querySelector('[data-mini-audio]');
+      const title = player.querySelector('[data-mini-title]');
+      const toggle = player.querySelector('[data-mini-toggle]');
+      const toggleIcon = player.querySelector('[data-mini-toggle-icon]');
+      const post = player.querySelector('[data-mini-post]');
+      const tracks = [...player.querySelectorAll('[data-mini-tracks] span')];
+      let currentTrack = -1;
+
+      const updateState = () => {
+        const playing = !audio.paused;
+        toggleIcon.textContent = playing ? '❚❚' : '▶';
+        toggle.setAttribute('aria-label', playing ? 'Pause audio' : 'Play audio');
+        toggle.setAttribute('title', playing ? 'Pause audio' : 'Play audio');
+      };
+      const play = () => audio.play().then(updateState).catch(updateState);
+      const setRandomTrack = () => {
+        let nextTrack = Math.floor(Math.random() * tracks.length);
+        if (tracks.length > 1 && nextTrack === currentTrack) nextTrack = (nextTrack + 1) % tracks.length;
+        currentTrack = nextTrack;
+        const track = tracks[currentTrack];
+        audio.src = track.dataset.src;
+        title.textContent = track.dataset.title;
+        post.href = track.dataset.post;
+        play();
+      };
+
+      toggle.addEventListener('click', () => audio.paused ? play() : audio.pause());
+      player.querySelector('[data-mini-random]').addEventListener('click', setRandomTrack);
+      audio.addEventListener('play', updateState);
+      audio.addEventListener('pause', updateState);
+      setRandomTrack();
+    });
+  })();
+</script>
