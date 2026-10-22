@@ -1,0 +1,49 @@
+name: Pasteruperer
+options:
+  bundleIdPrefix: com.dyldog
+  deploymentTarget:
+    macOS: "15.0"
+  createIntermediateGroups: true
+settings:
+  base:
+    SWIFT_VERSION: "6.0"
+    MARKETING_VERSION: "1.0"
+    CURRENT_PROJECT_VERSION: "1"
+    CODE_SIGN_IDENTITY: "-"
+    CODE_SIGN_STYLE: Manual
+    DEVELOPMENT_TEAM: ""
+targets:
+  Pasteruperer:
+    type: application
+    platform: macOS
+    sources: [Pasteruperer]
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.dyldog.pasteruperer
+        GENERATE_INFOPLIST_FILE: YES
+        INFOPLIST_KEY_CFBundleDisplayName: Pasteruperer
+        INFOPLIST_KEY_LSApplicationCategoryType: public.app-category.productivity
+        INFOPLIST_KEY_NSHumanReadableCopyright: ""
+        # The app runs git and writes into the blog checkout, so it can't be sandboxed.
+        ENABLE_APP_SANDBOX: NO
+        ENABLE_HARDENED_RUNTIME: NO
+        ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
+        ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME: AccentColor
+  PasteruperTests:
+    type: bundle.unit-test
+    platform: macOS
+    sources: [PasteruperTests]
+    dependencies:
+      - target: Pasteruperer
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.dyldog.pasteruperer.tests
+        GENERATE_INFOPLIST_FILE: YES
+schemes:
+  Pasteruperer:
+    build:
+      targets:
+        Pasteruperer: all
+        PasteruperTests: [test]
+    test:
+      targets: [PasteruperTests]

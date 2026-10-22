@@ -11,3 +11,10 @@ theme_config:
   back_home_text: "←"
 plugins:
   - jekyll-feed
+# Listing exclude replaces Jekyll's defaults, so they're repeated here alongside tools/.
+exclude:
+  - Gemfile
+  - Gemfile.lock
+  - node_modules
+  - vendor
+  - tools
