@@ -1,20 +1,32 @@
-{% assign first_track = include.tracks | first %}
+{% assign music_files = site.static_files | where_exp: "file", "file.path contains '/art/music/'" %}
 <section class="mini-player" data-mini-player aria-label="Random music player">
   <p class="mini-player__eyebrow">random tune</p>
   <div class="mini-player__main">
     <div class="mini-player__row">
-      <p class="mini-player__track" aria-live="polite"><strong data-mini-title>{{ first_track.title }}</strong></p>
+      <p class="mini-player__track" aria-live="polite"><strong data-mini-title>Loading…</strong></p>
       <div class="mini-player__controls">
-        <button type="button" data-mini-toggle aria-label="Pause audio" title="Pause audio"><span data-mini-toggle-icon aria-hidden="true">❚❚</span></button>
+        <button type="button" data-mini-toggle aria-label="Play audio" title="Play audio"><span data-mini-toggle-icon aria-hidden="true">▶</span></button>
         <button type="button" data-mini-random aria-label="Play another random track" title="Another random track"><span aria-hidden="true">↻</span></button>
-        <a data-mini-post href="{{ first_track.post | relative_url }}" aria-label="Go to this track's post" title="Go to post"><span aria-hidden="true">↗</span></a>
+        <a data-mini-post hidden aria-label="Go to this track's post" title="Go to post"><span aria-hidden="true">↗</span></a>
       </div>
     </div>
   </div>
-  <audio data-mini-audio preload="metadata" autoplay playsinline loop src="{{ first_track.src | relative_url }}"></audio>
+  <audio data-mini-audio preload="metadata" playsinline loop></audio>
   <div hidden data-mini-tracks>
-    {% for track in include.tracks %}
-      <span data-src="{{ track.src | relative_url }}" data-title="{{ track.title | escape }}" data-post="{{ track.post | relative_url }}"></span>
+    {% for music_file in music_files %}
+      {% if music_file.extname == '.m4a' %}
+        {% assign track_title = music_file.name | remove: music_file.extname | replace: '_', ' ' | replace: '-', ' ' | capitalize %}
+        {% assign track_post = '' %}
+        {% for collection in site.data %}
+          {% for track in collection[1] %}
+            {% if track.src == music_file.path %}
+              {% assign track_title = track.title %}
+              {% assign track_post = track.post | default: '' %}
+            {% endif %}
+          {% endfor %}
+        {% endfor %}
+        <span data-src="{{ music_file.path | relative_url }}" data-title="{{ track_title | escape }}"{% if track_post != '' %} data-post="{{ track_post | relative_url }}"{% endif %}></span>
+      {% endif %}
     {% endfor %}
   </div>
 </section>
@@ -42,6 +54,11 @@
       const tracks = [...player.querySelectorAll('[data-mini-tracks] span')];
       let currentTrack = -1;
 
+      if (!tracks.length) {
+        player.hidden = true;
+        return;
+      }
+
       const updateState = () => {
         const playing = !audio.paused;
         toggleIcon.textContent = playing ? '❚❚' : '▶';
@@ -56,7 +73,13 @@
         const track = tracks[currentTrack];
         audio.src = track.dataset.src;
         title.textContent = track.dataset.title;
-        post.href = track.dataset.post;
+        if (track.dataset.post) {
+          post.href = track.dataset.post;
+          post.hidden = false;
+        } else {
+          post.removeAttribute('href');
+          post.hidden = true;
+        }
         play();
       };
 

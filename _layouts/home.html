@@ -9,8 +9,7 @@ layout: default
     {%- endif -%}
   </div>
   {% if page.mini_player %}
-    {% assign homepage_tracks = site.data.lez-danze | concat: site.data.some-other-jams %}
-    {% include mini-player.html tracks=homepage_tracks %}
+    {% include mini-player.html %}
   {% endif %}
 </header>
 
